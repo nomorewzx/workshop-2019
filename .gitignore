@@ -1,2 +1,5 @@
 .idea/
 model_weights/
+data/
+__pycache__/
+*/__pycache__/
