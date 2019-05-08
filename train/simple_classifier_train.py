@@ -3,7 +3,7 @@ import os
 from keras.preprocessing.image import ImageDataGenerator
 
 import settings
-from classifier.simple_classifier import build_simple_classifier_model
+from classifier.classifier_models import build_simple_classifier_model
 
 nb_train_samples = 2000
 nb_validation_samples = 800

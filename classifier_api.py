@@ -1,5 +1,4 @@
 import json
-import os
 
 import numpy as np
 import tensorflow as tf
@@ -7,16 +6,13 @@ from PIL import Image
 from PIL.JpegImagePlugin import JpegImageFile
 from flask import Flask, request, abort
 
-import settings
-from classifier.simple_classifier import build_simple_classifier_model
+from classifier.classifier_model_loader import load_classifier_model
 
 app = Flask(__name__)
 
 ALLOWED_FILE_EXTENSIONS = ['jpeg', 'jpg', 'png']
 
-simple_classifier_model = build_simple_classifier_model()
-
-simple_classifier_model.load_weights(os.path.join(settings.MODEL_WEIGHTS_DIR, 'simple_classifier.h5'))
+classifier_model = load_classifier_model(is_load_vgg_backbone_classifier_model=False)
 
 graph = tf.get_default_graph()
 
@@ -38,7 +34,7 @@ def classify_dog_cat():
     to_classify_img = np.array(resized_img)
 
     with graph.as_default():
-        pred_result = simple_classifier_model.predict(np.array([to_classify_img]), batch_size=1)
+        pred_result = classifier_model.predict(np.array([to_classify_img]), batch_size=1)
 
     dog_prob = float(pred_result[0][0])
 
