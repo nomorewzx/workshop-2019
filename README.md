@@ -1,6 +1,6 @@
-##Workshop: Computer Vision and Deep Learning
+## Workshop: Computer Vision and Deep Learning ##
 
-####1. 安装Python virtualenv
+#### 1. 安装Python virtualenv ####
 推荐使用Pipenv管理virtualenv与依赖包.
 
 1. 确保本地已经安装 Python 3.6 以及 pip.
@@ -30,7 +30,7 @@
 ](https://pythonguidecn.readthedocs.io/zh/latest/dev/virtualenvs.html) 帮助安装Pipenv.
 
 
-####2. 下载所需数据
+#### 2. 下载所需数据 ####
 1. 下载 [Dog Cat数据集](https://drive.google.com/file/d/1ZZGnziQLhmoiz5Uz5GG5qKClfA9pM9GV/view)
 2. 将数据集解压并放在 `./data` 目录中, 确保目录结构如下
     
