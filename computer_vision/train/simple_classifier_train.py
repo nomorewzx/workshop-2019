@@ -58,4 +58,11 @@ def train_simple_classifier():
         validation_data=validation_generator,
         validation_steps=800 // batch_size)
 
+    if not os.path.exists(settings.MODEL_WEIGHTS_DIR):
+        os.makedirs(settings.MODEL_WEIGHTS_DIR)
+
     simple_classifier_model.save_weights(WEIGHTS_PATH)  # always save your weights after training or during training
+
+
+if __name__ == '__main__':
+    train_simple_classifier()

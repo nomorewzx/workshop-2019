@@ -17,6 +17,8 @@ def train_classifier(img_width, img_height,
     print('new model has {} layers'.format(len(classifier_model.layers)))
 
     if is_fine_tune_vgg:
+        classifier_model.load_weights(model_save_path)
+        print('load weights')
         for layer in classifier_model.layers[:15]:
             layer.trainable = False
     else:
@@ -26,7 +28,7 @@ def train_classifier(img_width, img_height,
     classifier_model.summary()
 
     classifier_model.compile(loss='binary_crossentropy',
-                  optimizer=optimizers.Adam(),
+                  optimizer=optimizers.Adam(lr=1e-4),
                   metrics=['accuracy'])
 
     # prepare data augmentation configuration
@@ -72,6 +74,9 @@ if __name__ == '__main__':
 
     epochs = 20
     batch_size = 32
+
+    if not os.path.exists(settings.MODEL_WEIGHTS_DIR):
+        os.makedirs(settings.MODEL_WEIGHTS_DIR)
 
     model_save_path = os.path.join(settings.MODEL_WEIGHTS_DIR, 'vgg16_backbone_classifier.h5')
 
