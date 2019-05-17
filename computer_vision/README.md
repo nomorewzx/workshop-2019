@@ -37,7 +37,7 @@
 1. 下载 [Dog Cat数据集](https://drive.google.com/file/d/1ZZGnziQLhmoiz5Uz5GG5qKClfA9pM9GV/view)
 2. 将数据集解压并放在 `./data` 目录中, 确保目录结构如下
     
-        workshop-root
+        computer_vision
             |--data
                 |-- train
                     |-- cat
