@@ -34,14 +34,23 @@
 
 
 #### 2. 下载所需数据 ####
-1. 下载 [Dog Cat数据集](https://drive.google.com/file/d/1ZZGnziQLhmoiz5Uz5GG5qKClfA9pM9GV/view)
+1. 从Google Drive下载 [Dog Cat数据集](https://drive.google.com/file/d/1ZZGnziQLhmoiz5Uz5GG5qKClfA9pM9GV/view)
 2. 将数据集解压并放在 `./data` 目录中, 确保目录结构如下
     
         computer_vision
             |--data
                 |-- train
                     |-- cat
+                        |-- cat.y1.jpg
+                        |-- ...
                     |-- dog
+                        |-- dog.x1.jpg
+                        |-- ...
                 |-- validation
                     |--cat
+                        |--cat.y2.jpg
+                        |--...
                     |--dog
+                        |--dog.x2.jpg
+                        |--...
+3. 安装完成keras后, 下载[VGG16预训练模型](https://github.com/fchollet/deep-learning-models/releases/download/v0.1/vgg16_weights_tf_dim_ordering_tf_kernels_notop.h5),并将模型保存在 `~/.keras/models/` 文件夹中.
