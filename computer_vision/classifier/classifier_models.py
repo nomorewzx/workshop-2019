@@ -21,6 +21,8 @@ def build_simple_classifier_model(img_height=150, img_width=150):
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
 
+    # 指定网络模型, 要求实现
+
     model.add(Conv2D(64, (3, 3)))
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
