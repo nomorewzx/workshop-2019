@@ -1,7 +1,7 @@
 import os
 
 from keras.preprocessing.image import ImageDataGenerator
-
+from keras import optimizers
 import settings
 from classifier.classifier_models import build_simple_classifier_model
 
@@ -21,7 +21,7 @@ def train_simple_classifier():
     simple_classifier_model = build_simple_classifier_model()
 
     simple_classifier_model.compile(loss='binary_crossentropy',
-                  optimizer='adam',
+                  optimizer=optimizers.Adam(lr=1e-4),
                   metrics=['accuracy'])
 
     # this is the augmentation configuration we will use for training

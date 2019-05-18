@@ -73,18 +73,28 @@ def build_simple_classifier_model(img_height=150, img_width=150):
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
 
-    model.add(Conv2D(32, (3, 3)))
+    model.add(Conv2D(64, (3, 3)))
+    model.add(Conv2D(64, (3, 3)))    
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
 
-    # 指定网络模型, 要求实现
+    model.add(Conv2D(128, (3, 3)))
+    model.add(Conv2D(128, (3, 3)))    
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
 
-    model.add(Conv2D(64, (3, 3)))
+    model.add(Conv2D(256, (3, 3)))
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+
+    model.add(Conv2D(512, (3, 3)))
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
 
     model.add(Flatten())
-    model.add(Dense(64))
+    model.add(Dense(1024))
+    model.add(Activation('relu'))
+    model.add(Dense(1024))
     model.add(Activation('relu'))
     model.add(Dropout(0.5))
     model.add(Dense(1))
