@@ -3,3 +3,4 @@ computer_vision/model_weights/
 computer_vision/data/
 __pycache__/
 */__pycache__/
+computer_vision/.vscode
