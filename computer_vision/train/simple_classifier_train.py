@@ -10,9 +10,9 @@ nb_validation_samples = 800
 epochs = 50
 batch_size = 16
 
-TRAIN_DATA_DIR = os.path.join(settings.DATA_DIR, 'dog_cat', 'train')
+TRAIN_DATA_DIR = os.path.join(settings.DATA_DIR, 'train')
 
-VALIDATION_DATA_DIR = os.path.join(settings.DATA_DIR, 'dog_cat', 'validation')
+VALIDATION_DATA_DIR = os.path.join(settings.DATA_DIR, 'validation')
 
 WEIGHTS_PATH = os.path.join(settings.MODEL_WEIGHTS_DIR, 'simple_classifier.h5')
 
@@ -39,14 +39,14 @@ def train_simple_classifier():
     # subfolers of 'data/train', and indefinitely generate
     # batches of augmented image data
     train_generator = train_datagen.flow_from_directory(
-        'data/train',  # this is the target directory
+        TRAIN_DATA_DIR,  # this is the target directory
         target_size=(150, 150),  # all images will be resized to 150x150
         batch_size=batch_size,
         class_mode='binary')  # since we use binary_crossentropy loss, we need binary labels
 
     # this is a similar generator, for validation data
     validation_generator = test_datagen.flow_from_directory(
-        'data/validation',
+        VALIDATION_DATA_DIR,
         target_size=(150, 150),
         batch_size=batch_size,
         class_mode='binary')
