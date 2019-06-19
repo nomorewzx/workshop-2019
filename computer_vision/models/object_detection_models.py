@@ -22,8 +22,9 @@ class BBox:
 
 
 class ImageData:
-    def __init__(self, img_file_path: str, bboxs: List[BBox], img_width: int, img_height: int):
+    def __init__(self, img_file_path: str, img_file_name: str, bboxs: List[BBox], img_width: int, img_height: int):
         self.img_file_path: str = img_file_path
+        self.img_file_name = img_file_name
         self.bboxes: List[BBox] = bboxs
         self.img_width = img_width
         self.img_height = img_height

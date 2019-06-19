@@ -3,7 +3,7 @@ import random
 import cv2
 import numpy as np
 
-from img_aug.img_aug import augment
+from img_augentation.img_aug import augment
 from object_detection.iou_calculator import iou
 
 
