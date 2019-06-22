@@ -1,3 +1,5 @@
+from typing import Tuple, List
+
 import cv2
 import copy
 import numpy as np
@@ -5,7 +7,7 @@ import numpy as np
 from models.object_detection_models import ImageData
 
 
-def augment(img_data: ImageData, config, augment=True):
+def augment(img_data: ImageData, config, augment=True) -> Tuple[ImageData, np.ndarray]:
     assert type(img_data) is ImageData
 
     img_data_aug: ImageData = copy.deepcopy(img_data)

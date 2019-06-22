@@ -31,3 +31,17 @@ class ImageData:
 
     def add_bbox(self, bbox: BBox):
         self.bboxes.append(bbox)
+
+    def resize_bboxes(self, resized_img_height, resized_img_width) -> 'ImageData':
+        new_bboxes = []
+        for bbox_num, bbox in enumerate(self.bboxes):
+            # get the GT box coordinates, and resize to account for image resizing
+            new_x1 = bbox.x1 * (resized_img_width / float(self.img_width))
+            new_x2 = bbox.x2 * (resized_img_width / float(self.img_width))
+            new_y1 = bbox.y1 * (resized_img_height / float(self.img_height))
+            new_y2 = bbox.y2 * (resized_img_height / float(self.img_height))
+            new_bbox = BBox(x1=new_x1, x2=new_x2, y1=new_y1, y2=new_y2, class_name=bbox.class_name)
+            new_bboxes.append(new_bbox)
+
+        return ImageData(img_file_name=self.img_file_name, img_file_path=self.img_file_path, img_width=resized_img_width,
+                         img_height=resized_img_height, bboxs=new_bboxes)

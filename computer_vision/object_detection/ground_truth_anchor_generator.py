@@ -4,6 +4,8 @@ import cv2
 import numpy as np
 
 from img_augentation.img_aug import augment
+from models.object_detection_models import ImageData
+from object_detection.config import Config
 from object_detection.iou_calculator import iou
 
 
@@ -47,7 +49,7 @@ def get_anchor_gt(all_img_data, C, img_length_calc_function, mode='train'):
                 else:
                     img_data_aug, x_img = augment(img_data, C, augment=False)
 
-                (width, height) = (img_data_aug['width'], img_data_aug['height'])
+                (width, height) = (img_data_aug.img_width, img_data_aug.img_height)
                 (rows, cols, _) = x_img.shape
 
                 assert cols == width
@@ -90,7 +92,8 @@ def get_anchor_gt(all_img_data, C, img_length_calc_function, mode='train'):
                 continue
 
 
-def calc_rpn(C, img_data, width, height, resized_width, resized_height, img_length_calc_function):
+def calc_rpn(C: Config, img_data: ImageData, width: int, height: int, resized_width: int, resized_height: int,
+             img_length_calc_function):
     """(Important part!) Calculate the rpn for all anchors
         If feature map has shape 38x50=1900, there are 1900x9=17100 potential anchors
 
@@ -125,7 +128,7 @@ def calc_rpn(C, img_data, width, height, resized_width, resized_height, img_leng
     y_is_box_valid = np.zeros((output_height, output_width, num_anchors))
     y_rpn_regr = np.zeros((output_height, output_width, num_anchors * 4))
 
-    num_bboxes = len(img_data['bboxes'])
+    num_bboxes = len(img_data.bboxes)
 
     num_anchors_for_bbox = np.zeros(num_bboxes).astype(int)
     best_anchor_for_bbox = -1 * np.ones((num_bboxes, 4)).astype(int)
@@ -135,12 +138,12 @@ def calc_rpn(C, img_data, width, height, resized_width, resized_height, img_leng
 
     # get the GT box coordinates, and resize to account for image resizing
     gta = np.zeros((num_bboxes, 4))
-    for bbox_num, bbox in enumerate(img_data['bboxes']):
+    for bbox_num, bbox in enumerate(img_data.bboxes):
         # get the GT box coordinates, and resize to account for image resizing
-        gta[bbox_num, 0] = bbox['x1'] * (resized_width / float(width))
-        gta[bbox_num, 1] = bbox['x2'] * (resized_width / float(width))
-        gta[bbox_num, 2] = bbox['y1'] * (resized_height / float(height))
-        gta[bbox_num, 3] = bbox['y2'] * (resized_height / float(height))
+        gta[bbox_num, 0] = bbox.x1 * (resized_width / float(width))
+        gta[bbox_num, 1] = bbox.x2 * (resized_width / float(width))
+        gta[bbox_num, 2] = bbox.y1 * (resized_height / float(height))
+        gta[bbox_num, 3] = bbox.y2 * (resized_height / float(height))
 
     # rpn ground truth
 
