@@ -60,6 +60,7 @@ def get_anchor_gt(all_img_data, C, img_length_calc_function, mode='train'):
 
                 # resize the image so that smalles side is length = 300px
                 x_img = cv2.resize(x_img, (resized_width, resized_height), interpolation=cv2.INTER_CUBIC)
+
                 debug_img = x_img.copy()
 
                 try:
@@ -138,15 +139,15 @@ def calc_rpn(C: Config, img_data: ImageData, width: int, height: int, resized_wi
 
     # get the GT box coordinates, and resize to account for image resizing
     gta = np.zeros((num_bboxes, 4))
-    for bbox_num, bbox in enumerate(img_data.bboxes):
+    resized_img_data = img_data.resize_bboxes(resized_img_width=resized_width, resized_img_height=resized_height)
+    for bbox_num, bbox in enumerate(resized_img_data.bboxes):
         # get the GT box coordinates, and resize to account for image resizing
-        gta[bbox_num, 0] = bbox.x1 * (resized_width / float(width))
-        gta[bbox_num, 1] = bbox.x2 * (resized_width / float(width))
-        gta[bbox_num, 2] = bbox.y1 * (resized_height / float(height))
-        gta[bbox_num, 3] = bbox.y2 * (resized_height / float(height))
+        gta[bbox_num, 0] = bbox.x1
+        gta[bbox_num, 1] = bbox.x2
+        gta[bbox_num, 2] = bbox.y1
+        gta[bbox_num, 3] = bbox.y2
 
     # rpn ground truth
-
     for anchor_size_idx in range(len(anchor_sizes)):
         for anchor_ratio_idx in range(n_anchratios):
             anchor_x = anchor_sizes[anchor_size_idx] * anchor_ratios[anchor_ratio_idx][0]
@@ -186,30 +187,31 @@ def calc_rpn(C: Config, img_data: ImageData, width: int, height: int, resized_wi
                                        [x1_anc, y1_anc, x2_anc, y2_anc])
                         # calculate the regression targets if they will be needed
                         if curr_iou > best_iou_for_bbox[bbox_num] or curr_iou > C.rpn_max_overlap:
-                            cx = (gta[bbox_num, 0] + gta[bbox_num, 1]) / 2.0
-                            cy = (gta[bbox_num, 2] + gta[bbox_num, 3]) / 2.0
-                            cxa = (x1_anc + x2_anc) / 2.0
-                            cya = (y1_anc + y2_anc) / 2.0
+                            gt_cx = (gta[bbox_num, 0] + gta[bbox_num, 1]) / 2.0
+                            gt_cy = (gta[bbox_num, 2] + gta[bbox_num, 3]) / 2.0
+                            anchor_cx = (x1_anc + x2_anc) / 2.0
+                            anchor_cy = (y1_anc + y2_anc) / 2.0
 
-                            # x,y are the center point of ground-truth bbox
-                            # xa,ya are the center point of anchor bbox (xa=downscale * (ix + 0.5); ya=downscale * (iy+0.5))
+                            # gt_cx, gt_cy are the center point of ground-truth bbox
+                            # anchor_cx, anchor_cy are the center point of anchor bbox (xa=downscale * (ix + 0.5); ya=downscale * (iy+0.5))
                             # w,h are the width and height of ground-truth bbox
-                            # wa,ha are the width and height of anchor bboxe
-                            # tx = (x - xa) / wa
-                            # ty = (y - ya) / ha
+                            # wa,ha are the width and height of anchor bbox
+                            # tx = (gt_cx - anchor_cx) / wa
+                            # ty = (gt_cy - anchor_cy) / ha
                             # tw = log(w / wa)
                             # th = log(h / ha)
-                            tx = (cx - cxa) / (x2_anc - x1_anc)
-                            ty = (cy - cya) / (y2_anc - y1_anc)
+                            tx = (gt_cx - anchor_cx) / (x2_anc - x1_anc)
+                            ty = (gt_cy - anchor_cy) / (y2_anc - y1_anc)
                             tw = np.log((gta[bbox_num, 1] - gta[bbox_num, 0]) / (x2_anc - x1_anc))
                             th = np.log((gta[bbox_num, 3] - gta[bbox_num, 2]) / (y2_anc - y1_anc))
 
-                        if img_data['bboxes'][bbox_num]['class'] != 'bg':
+                        if img_data.bboxes[bbox_num].class_name != 'bg':
 
                             # all GT boxes should be mapped to an anchor box, so we keep track of which anchor box was best
                             if curr_iou > best_iou_for_bbox[bbox_num]:
-                                best_anchor_for_bbox[bbox_num] = [jy, ix, anchor_ratio_idx, anchor_size_idx]
                                 best_iou_for_bbox[bbox_num] = curr_iou
+
+                                best_anchor_for_bbox[bbox_num] = [jy, ix, anchor_ratio_idx, anchor_size_idx]
                                 best_x_for_bbox[bbox_num, :] = [x1_anc, x2_anc, y1_anc, y2_anc]
                                 best_dx_for_bbox[bbox_num, :] = [tx, ty, tw, th]
 
