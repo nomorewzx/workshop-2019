@@ -22,6 +22,13 @@ def get_new_img_size(width, height, img_min_side=300):
     return resized_width, resized_height
 
 
+def get_img_output_length(width, height):
+    def get_output_length(input_length):
+        return input_length//16
+
+    return get_output_length(width), get_output_length(height)
+
+
 def get_anchor_gt(all_img_data, C, img_length_calc_function, mode='train'):
     """ Yield the ground-truth anchors as Y (labels)
 
@@ -80,11 +87,9 @@ def get_anchor_gt(all_img_data, C, img_length_calc_function, mode='train'):
                 x_img = np.transpose(x_img, (2, 0, 1))
                 x_img = np.expand_dims(x_img, axis=0)
 
-                y_rpn_regr[:, y_rpn_regr.shape[1] // 2:, :, :] *= C.std_scaling
+                y_rpn_regr[:, :, :, y_rpn_regr.shape[1] // 2:] *= C.std_scaling
 
                 x_img = np.transpose(x_img, (0, 2, 3, 1))
-                y_rpn_cls = np.transpose(y_rpn_cls, (0, 2, 3, 1))
-                y_rpn_regr = np.transpose(y_rpn_regr, (0, 2, 3, 1))
 
                 yield np.copy(x_img), [np.copy(y_rpn_cls), np.copy(y_rpn_regr)], img_data_aug, debug_img, num_pos
 
@@ -128,6 +133,7 @@ def calc_rpn(C: Config, img_data: ImageData, width: int, height: int, resized_wi
     y_rpn_overlap = np.zeros((output_height, output_width, num_anchors))
     y_is_box_valid = np.zeros((output_height, output_width, num_anchors))
     y_rpn_regr = np.zeros((output_height, output_width, num_anchors * 4))
+    y_debug_rpn_anchor_bbox = np.zeros((output_height, output_width, num_anchors * 4))
 
     num_bboxes = len(img_data.bboxes)
 
@@ -242,6 +248,8 @@ def calc_rpn(C: Config, img_data: ImageData, width: int, height: int, resized_wi
                         y_rpn_overlap[jy, ix, anchor_ratio_idx + n_anchratios * anchor_size_idx] = 1
                         start = 4 * (anchor_ratio_idx + n_anchratios * anchor_size_idx)
                         y_rpn_regr[jy, ix, start:start + 4] = best_regr
+                        anchor_bbx = [x1_anc, y1_anc, x2_anc, y2_anc]
+                        y_debug_rpn_anchor_bbox[jy, ix, start:start + 4] = anchor_bbx
 
     # we ensure that every bbox has at least one positive RPN region
 
@@ -271,10 +279,12 @@ def calc_rpn(C: Config, img_data: ImageData, width: int, height: int, resized_wi
     y_rpn_regr = np.transpose(y_rpn_regr, (2, 0, 1))
     y_rpn_regr = np.expand_dims(y_rpn_regr, axis=0)
 
+    y_debug_rpn_anchor_bbox = np.expand_dims(y_debug_rpn_anchor_bbox, axis=0)
+
     pos_locs = np.where(np.logical_and(y_rpn_overlap[0, :, :, :] == 1, y_is_box_valid[0, :, :, :] == 1))
     neg_locs = np.where(np.logical_and(y_rpn_overlap[0, :, :, :] == 0, y_is_box_valid[0, :, :, :] == 1))
 
-    num_pos = len(pos_locs[0])
+    num_positive = len(pos_locs[0])
 
     # one issue is that the RPN has many more negative than positive regions, so we turn off some of the negative
     # regions. We also limit it to 256 regions.
@@ -283,13 +293,16 @@ def calc_rpn(C: Config, img_data: ImageData, width: int, height: int, resized_wi
     if len(pos_locs[0]) > num_regions / 2:
         val_locs = random.sample(range(len(pos_locs[0])), len(pos_locs[0]) - num_regions / 2)
         y_is_box_valid[0, pos_locs[0][val_locs], pos_locs[1][val_locs], pos_locs[2][val_locs]] = 0
-        num_pos = num_regions / 2
+        num_positive = num_regions / 2
 
-    if len(neg_locs[0]) + num_pos > num_regions:
-        val_locs = random.sample(range(len(neg_locs[0])), len(neg_locs[0]) - num_pos)
+    if len(neg_locs[0]) + num_positive > num_regions:
+        val_locs = random.sample(range(len(neg_locs[0])), len(neg_locs[0]) - num_positive)
         y_is_box_valid[0, neg_locs[0][val_locs], neg_locs[1][val_locs], neg_locs[2][val_locs]] = 0
 
     y_rpn_cls = np.concatenate([y_is_box_valid, y_rpn_overlap], axis=1)
     y_rpn_regr = np.concatenate([np.repeat(y_rpn_overlap, 4, axis=1), y_rpn_regr], axis=1)
 
-    return np.copy(y_rpn_cls), np.copy(y_rpn_regr), num_pos
+    y_rpn_cls = np.transpose(y_rpn_cls, (0, 2, 3, 1))
+    y_rpn_regr = np.transpose(y_rpn_regr, (0, 2, 3, 1))
+
+    return np.copy(y_rpn_cls), np.copy(y_rpn_regr), num_positive, y_debug_rpn_anchor_bbox
