@@ -56,3 +56,7 @@ class Config:
         self.class_mapping = None
 
         self.model_path = None
+
+        self.base_net_weights = None
+
+        self.training_record_path = None
