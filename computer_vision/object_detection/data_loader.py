@@ -3,7 +3,7 @@ from typing import List
 import cv2
 import os
 
-from models.object_detection_models import ImageData, BBox
+from data_models.object_detection_models import ImageData, BBox
 
 
 def get_data(annotation_file_path, img_dir):

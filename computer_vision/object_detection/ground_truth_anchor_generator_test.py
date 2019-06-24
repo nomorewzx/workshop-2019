@@ -1,6 +1,6 @@
 import unittest
 
-from models.object_detection_models import BBox, ImageData
+from data_models.object_detection_models import BBox, ImageData
 from object_detection.config import Config
 from object_detection.ground_truth_anchor_generator import calc_rpn, get_new_img_size, get_img_output_length
 import cv2

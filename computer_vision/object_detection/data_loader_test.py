@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from models.object_detection_models import ImageData
+from data_models.object_detection_models import ImageData
 from object_detection.data_loader import get_data
 from object_detection.img_debug_display import display_img_data
 

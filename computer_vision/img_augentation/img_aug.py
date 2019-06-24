@@ -4,7 +4,7 @@ import cv2
 import copy
 import numpy as np
 
-from models.object_detection_models import ImageData
+from data_models.object_detection_models import ImageData
 
 
 def augment(img_data: ImageData, config, augment=True) -> Tuple[ImageData, np.ndarray]:

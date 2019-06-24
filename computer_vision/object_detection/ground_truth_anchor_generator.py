@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 
 from img_augentation.img_aug import augment
-from models.object_detection_models import ImageData
+from data_models.object_detection_models import ImageData
 from object_detection.config import Config
 from object_detection.iou_calculator import iou
 

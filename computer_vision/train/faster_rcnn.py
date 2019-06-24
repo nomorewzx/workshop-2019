@@ -7,10 +7,10 @@ import numpy as np
 import pandas as pd
 from keras.utils import generic_utils
 
-from models.object_detection_models import ImageData
+from data_models.object_detection_models import ImageData
 from object_detection.config import Config
-from object_detection.faster_rcnn.model import build_faster_rcnn_model
-from object_detection.faster_rcnn.model_components import rpn_to_roi, calc_iou
+from object_detection.faster_rcnn.neural_network import build_faster_rcnn
+from object_detection.faster_rcnn.neural_network_components import rpn_to_roi, calc_iou
 from object_detection.ground_truth_anchor_generator import get_anchor_gt, get_img_output_length
 from keras import backend as K
 import matplotlib.pyplot as plt
@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 
 def train_faster_rcnn(config: Config, train_imgs: List[ImageData], class_mapping):
     class_count = 3
-    model_rpn, model_classifier, model_all = build_faster_rcnn_model(config, class_num=class_count)
+    model_rpn, model_classifier, model_all = build_faster_rcnn(config, class_num=class_count)
 
     model_rpn, model_classifier, record_df = load_weights_for_models(config, model_rpn, model_classifier)
 

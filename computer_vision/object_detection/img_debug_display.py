@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.patches import Rectangle
-from models.object_detection_models import ImageData
+from data_models.object_detection_models import ImageData
 from settings import MATPLOTLIB_COLORS
 import cv2
 

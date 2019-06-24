@@ -2,12 +2,12 @@ from keras.layers import Input
 from keras.models import Model
 
 from object_detection.config import Config
-from object_detection.faster_rcnn.model_components import nn_base, rpn_layer, classifier_layer
+from object_detection.faster_rcnn.neural_network_components import nn_base, rpn_layer, classifier_layer
 from object_detection.losses import rpn_loss_cls, rpn_loss_regr, class_loss_cls, class_loss_regr
 from keras.optimizers import Adam, SGD, RMSprop
 
 
-def build_faster_rcnn_model(config: Config, class_num):
+def build_faster_rcnn(config: Config, class_num):
     input_shape_img = (None, None, 3)
 
     img_input = Input(shape=input_shape_img)
@@ -24,7 +24,7 @@ def build_faster_rcnn_model(config: Config, class_num):
     model_rpn = Model(img_input, rpn[:2])
     model_classifier = Model([img_input, roi_input], classifier)
 
-    # this is a model that holds both the RPN and the classifier, used to load/save weights for the models
+    # this is a model that holds both the RPN and the classifier, used to load/save weights for the data_models
     faster_rcnn_model = Model([img_input, roi_input], rpn[:2] + classifier)
 
     optimizer = Adam(lr=1e-5)

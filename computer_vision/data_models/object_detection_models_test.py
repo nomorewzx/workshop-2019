@@ -1,6 +1,6 @@
 import unittest
 
-from models.object_detection_models import ImageData, BBox
+from data_models.object_detection_models import ImageData, BBox
 from object_detection.img_debug_display import display_img_data
 
 
