@@ -76,4 +76,10 @@
 
 3. Faster RCNN的Trained Weights将在后续附上.
 
-4. 查看样例图片与标注.
+4. 查看训练集样例图片与标注. 执行以下命令来查看样例图片与相应的标注.
+
+        python -m unittest object_detection.data_loader_test
+   
+   样例图片与标注如下所示:
+   ![样例图片与标注](sample/annotation_sample.png)
+
