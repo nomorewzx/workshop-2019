@@ -82,4 +82,10 @@
    
    样例图片与标注如下所示:
    ![样例图片与标注](sample/annotation_sample.png)
+   
+ 
+ > Faster RCNN的实现主要参考以下资料:  
+ >1. [Faster R-CNN (object detection) implemented by Keras for custom data from Google’s Open Images Dataset V4](https://towardsdatascience.com/faster-r-cnn-object-detection-implemented-by-keras-for-custom-data-from-googles-open-images-125f62b9141a)  
+ >2. [Faster R-CNN: Down the rabbit hole of modern object detection](https://tryolabs.com/blog/2018/01/18/faster-r-cnn-down-the-rabbit-hole-of-modern-object-detection/)
+ >3. [Faster_RCNN_for_Open_Images_Dataset_Keras](https://github.com/RockyXu66/Faster_RCNN_for_Open_Images_Dataset_Keras)
 
