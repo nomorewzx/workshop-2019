@@ -15,6 +15,7 @@ from object_detection.ground_truth_anchor_generator import get_new_img_size
 
 class FasterRcnnEvaluationTest(unittest.TestCase):
     def test_evaluate_rpn_of_faster_rcnn(self):
+        show_all_rpn_bboxes = False
         valid_box_count = 0
         display_n_th_box = 2
 
@@ -87,7 +88,7 @@ class FasterRcnnEvaluationTest(unittest.TestCase):
                     continue
 
                 valid_box_count += 1
-                if valid_box_count != display_n_th_box:
+                if not show_all_rpn_bboxes and valid_box_count != display_n_th_box:
                     continue
 
                 print('the regression is {}'.format((tx, ty, tw, th)))
@@ -102,7 +103,9 @@ class FasterRcnnEvaluationTest(unittest.TestCase):
                                       linestyle='--',
                                       facecolor='none')
                 axes.add_patch(bbox_rect)
-                break
+
+                if not show_all_rpn_bboxes:
+                    break
         fig.add_axes(axes)
         plt.show()
 
