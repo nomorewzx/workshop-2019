@@ -14,11 +14,14 @@ from object_detection.ground_truth_anchor_generator import get_new_img_size
 
 
 class FasterRcnnEvaluationTest(unittest.TestCase):
-    def test_evaluate_faster_rcnn(self):
+    def test_evaluate_rpn_of_faster_rcnn(self):
+        valid_box_count = 0
+        display_n_th_box = 2
+
         config = Config()
         config.model_path = os.path.join(settings.MODEL_WEIGHTS_DIR, 'faster_rcnn', 'model_frcnn_vgg.hdf5')
 
-        img_file_path = os.path.join(settings.PROJECT_BASE_DIR, 'object_detection', 'resources', '0e9b73b26eb837ec.jpg')
+        img_file_path = os.path.join(settings.PROJECT_BASE_DIR, 'object_detection', 'resources', 'c6dad5afbd0ff7a1.jpg')
 
         to_predict_img = cv2.imread(img_file_path)
 
@@ -39,8 +42,6 @@ class FasterRcnnEvaluationTest(unittest.TestCase):
         positive_prediction = np.where(rpn_classes > 0.99)
         print(positive_prediction[-1])
         print(len(positive_prediction[0]))
-        valid_box_count = 0
-        display_n_th_box = 20
         for i in range(len(positive_prediction[0])):
             img_idx = positive_prediction[0][i]
             row_idx = positive_prediction[1][i]
@@ -58,13 +59,11 @@ class FasterRcnnEvaluationTest(unittest.TestCase):
             anchor_y1 = config.rpn_stride * (row_idx + 0.5) - anchor_y / 2
             anchor_y2 = config.rpn_stride * (row_idx + 0.5) + anchor_y / 2
 
-            if anchor_x1 < 0 or anchor_x2 > resized_width or anchor_y1 < 0 or anchor_y2 > resized_height:
+            if not self._is_bbox_in_img(x1=anchor_x1, x2=anchor_x2, y1=anchor_y1, y2=anchor_y2,
+                                    img_height=resized_height, img_width=resized_height):
                 print('this anchor is out of image boundary')
                 continue
             else:
-                valid_box_count += 1
-                if valid_box_count != display_n_th_box:
-                    continue
                 print('find valid positive anchor at row: {}, col: {}, anchor_idx: {}'.format(row_idx, col_idx, anchor_idx))
                 anchor_cx = (anchor_x1 + anchor_x2) / 2.0
                 anchor_cy = (anchor_y1 + anchor_y2) / 2.0
@@ -78,6 +77,18 @@ class FasterRcnnEvaluationTest(unittest.TestCase):
 
                 predicted_bbox_x1 = predicted_bbox_cx - predicted_bbox_width / 2
                 predicted_bbox_y1 = predicted_bbox_cy - predicted_bbox_height / 2
+
+                predicted_bbox_x2 = predicted_bbox_cx + predicted_bbox_width / 2
+                predicted_bbox_y2 = predicted_bbox_cy + predicted_bbox_height / 2
+
+                if not self._is_bbox_in_img(x1=predicted_bbox_x1, y1=predicted_bbox_y1, x2=predicted_bbox_x2, y2=predicted_bbox_y2
+                                        , img_width=resized_width, img_height=resized_height):
+                    print('calculated bbox is not in image')
+                    continue
+
+                valid_box_count += 1
+                if valid_box_count != display_n_th_box:
+                    continue
 
                 print('the regression is {}'.format((tx, ty, tw, th)))
                 print('anchor x1: {}, y1: {}'.format(anchor_x1, anchor_y1))
@@ -94,3 +105,9 @@ class FasterRcnnEvaluationTest(unittest.TestCase):
                 break
         fig.add_axes(axes)
         plt.show()
+
+    def _is_bbox_in_img(self, x1, y1, x2, y2, img_width, img_height):
+        if x1 < 0 or x2 > img_width or y1 < 0 or y2 > img_height:
+            return False
+
+        return True
