@@ -73,7 +73,12 @@
                     |--annotation.txt
                     |--test_annotation.txt
 
-3. Faster RCNN的Trained Weights将在后续附上.
+3. 从腾讯云盘下载 [Faster RCNN的Trained Weights](https://share.weiyun.com/5eqK3jE), 并存放在`model_weight/faster_rcnn/`中. 目录结构如下:
+    
+        computer_vision
+            |--model_weights
+                |--faster_rcnn
+                    |-- model_frcnn_vgg.h5
 
 4. 查看训练集样例图片与标注. 执行以下命令来查看样例图片与相应的标注.
 
