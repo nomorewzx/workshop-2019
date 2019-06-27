@@ -169,7 +169,6 @@ def calc_rpn(C: Config, img_data: ImageData, width: int, height: int, resized_wi
                     continue
 
                 for jy in range(output_height):
-
                     # y-coordinates of the current anchor box
                     y1_anc = downscale * (jy + 0.5) - anchor_y / 2
                     y2_anc = downscale * (jy + 0.5) + anchor_y / 2
