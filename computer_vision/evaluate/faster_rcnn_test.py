@@ -15,9 +15,9 @@ from object_detection.ground_truth_anchor_generator import get_new_img_size
 
 class FasterRcnnEvaluationTest(unittest.TestCase):
     def test_evaluate_rpn_of_faster_rcnn(self):
-        show_all_rpn_bboxes = False
+        show_all_rpn_bboxes = True
         valid_box_count = 0
-        display_n_th_box = 2
+        display_n_th_box = 5
 
         config = Config()
         config.model_path = os.path.join(settings.MODEL_WEIGHTS_DIR, 'faster_rcnn', 'model_frcnn_vgg.hdf5')
@@ -32,8 +32,10 @@ class FasterRcnnEvaluationTest(unittest.TestCase):
 
         test_img = cv2.resize(to_predict_img, (resized_width, resized_height))
         test_img = cv2.cvtColor(test_img, cv2.COLOR_BGR2RGB)
+
         predicted_rpn = evaluate_faster_rcnn(config=config, img=test_img)
-        rpn_classes = predicted_rpn[0]
+        # [(classification_output), (regression_output)]
+        rpn_classes = predicted_rpn[0] # [[x,y,anchor_idx],[],[]]
         rpn_regression = predicted_rpn[1]
 
         fig: Figure = plt.figure()
@@ -84,7 +86,7 @@ class FasterRcnnEvaluationTest(unittest.TestCase):
 
                 if not self._is_bbox_in_img(x1=predicted_bbox_x1, y1=predicted_bbox_y1, x2=predicted_bbox_x2, y2=predicted_bbox_y2
                                         , img_width=resized_width, img_height=resized_height):
-                    print('calculated bbox is not in image')
+                    print('calculated bbox is not in image range')
                     continue
 
                 valid_box_count += 1
@@ -106,6 +108,7 @@ class FasterRcnnEvaluationTest(unittest.TestCase):
 
                 if not show_all_rpn_bboxes:
                     break
+
         fig.add_axes(axes)
         plt.show()
 
