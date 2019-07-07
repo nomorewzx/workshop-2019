@@ -67,17 +67,16 @@ def get_anchor_gt(all_img_data, C, img_length_calc_function, mode='train'):
 
                 # resize the image so that smalles side is length = 300px
                 x_img = cv2.resize(x_img, (resized_width, resized_height), interpolation=cv2.INTER_CUBIC)
+                x_img = cv2.cvtColor(x_img, cv2.COLOR_BGR2RGB)
 
                 debug_img = x_img.copy()
 
                 try:
-                    y_rpn_cls, y_rpn_regr, num_pos = calc_rpn(C, img_data_aug, width, height, resized_width,
+                    y_rpn_cls, y_rpn_regr, num_pos = calc_rpn(C, img_data_aug, resized_width,
                                                               resized_height, img_length_calc_function)
                 except:
                     continue
                 # Zero-center by mean pixel, and preprocess image
-
-                x_img = x_img[:, :, (2, 1, 0)]  # BGR -> RGB
                 x_img = x_img.astype(np.float32)
                 x_img[:, :, 0] -= C.img_channel_mean[0]
                 x_img[:, :, 1] -= C.img_channel_mean[1]
@@ -98,8 +97,7 @@ def get_anchor_gt(all_img_data, C, img_length_calc_function, mode='train'):
                 continue
 
 
-def calc_rpn(C: Config, img_data: ImageData, width: int, height: int, resized_width: int, resized_height: int,
-             img_length_calc_function):
+def calc_rpn(C: Config, img_data: ImageData, resized_width: int, resized_height: int, img_length_calc_function):
     """(Important part!) Calculate the rpn for all anchors
         If feature map has shape 38x50=1900, there are 1900x9=17100 potential anchors
 

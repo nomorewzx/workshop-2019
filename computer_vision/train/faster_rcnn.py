@@ -17,45 +17,41 @@ import matplotlib.pyplot as plt
 
 
 def train_faster_rcnn(config: Config, train_imgs: List[ImageData], class_mapping):
-    class_count = 3
+    class_count = config.class_count
     model_rpn, model_classifier, model_all = build_faster_rcnn(config, class_num=class_count)
 
     model_rpn, model_classifier, record_df = load_weights_for_models(config, model_rpn, model_classifier)
 
     data_gen_train = get_anchor_gt(train_imgs, config, get_img_output_length, mode='train')
 
-    if not record_df.empty:
-        r_curr_loss = record_df['curr_loss']
-
     total_epochs = len(record_df)
-    r_epochs = len(record_df)
+    trained_epochs = len(record_df)
 
-    epoch_length = 1000
+    img_num_per_epoch = 1000
     num_epochs = 40
     iter_num = 0
 
     total_epochs += num_epochs
 
-    losses = np.zeros((epoch_length, 5))
+    losses = np.zeros((img_num_per_epoch, 5))
     rpn_accuracy_rpn_monitor = []
     rpn_accuracy_for_epoch = []
 
     if len(record_df) == 0:
         best_loss = np.Inf
     else:
-        best_loss = np.min(r_curr_loss)
+        best_loss = np.min(record_df['curr_loss'])
 
     start_time = time.time()
+
     for epoch_num in range(num_epochs):
+        progbar = generic_utils.Progbar(img_num_per_epoch)
+        print('Epoch {}/{}'.format(trained_epochs + 1, total_epochs))
+        trained_epochs += 1
 
-        progbar = generic_utils.Progbar(epoch_length)
-        print('Epoch {}/{}'.format(r_epochs + 1, total_epochs))
-
-        r_epochs += 1
         while True:
             try:
-
-                if len(rpn_accuracy_rpn_monitor) == epoch_length and config.verbose:
+                if len(rpn_accuracy_rpn_monitor) == img_num_per_epoch and config.verbose:
                     mean_overlapping_bboxes = float(sum(rpn_accuracy_rpn_monitor)) / len(rpn_accuracy_rpn_monitor)
                     rpn_accuracy_rpn_monitor = []
                     if mean_overlapping_bboxes == 0:
@@ -157,7 +153,7 @@ def train_faster_rcnn(config: Config, train_imgs: List[ImageData], class_mapping
                                 ('final_cls', np.mean(losses[:iter_num, 2])),
                                 ('final_regr', np.mean(losses[:iter_num, 3]))])
 
-                if iter_num == epoch_length:
+                if iter_num == img_num_per_epoch:
                     loss_rpn_cls = np.mean(losses[:, 0])
                     loss_rpn_regr = np.mean(losses[:, 1])
                     loss_class_cls = np.mean(losses[:, 2])
@@ -208,7 +204,7 @@ def train_faster_rcnn(config: Config, train_imgs: List[ImageData], class_mapping
                 continue
 
     print('Training complete, exiting.')
-    draw_losses(config, r_epochs)
+    draw_losses(config, trained_epochs)
 
 
 def draw_losses(config: Config, epoch_total_count):
@@ -271,5 +267,5 @@ def load_weights_for_models(config, model_rpn, model_classifier):
         # Load the records
         record_df = pd.read_csv(config.training_record_path)
 
-        print('Already train %dK batches' % (len(record_df)))
+        print('Already train {} batches'.format(len(record_df)))
     return model_rpn, model_classifier, record_df

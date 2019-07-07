@@ -28,8 +28,7 @@ class GroundTruthRpnGeneratorTest(unittest.TestCase):
 
         resized_img_data = img_data.resize_bboxes(resized_img_height=resized_height, resized_img_width=resized_width)
 
-        rpn_class, rpn_regression, num_pos, debug_rpn_anchor_bbxes = calc_rpn(C=config, img_data=img_data, width=width,
-                                                                              height=height,
+        rpn_class, rpn_regression, num_pos, debug_rpn_anchor_bbxes = calc_rpn(C=config, img_data=img_data,
                                                                               resized_width=resized_width,
                                                                               resized_height=resized_height,
                                                                               img_length_calc_function=get_img_output_length)
