@@ -86,7 +86,8 @@
    
    样例图片与标注如下所示:
    ![样例图片与标注](sample/annotation_sample.png)
-   
+
+5. [Part 1 录像: Faster RCNN中的RPN与训练数据生成](https://drive.google.com/file/d/18NXUiE4QmdemUgNqupXIWuO4SS3yaQUz/view?usp=sharing)
  
  > Faster RCNN的实现主要参考以下资料:  
  >1. [Faster R-CNN (object detection) implemented by Keras for custom data from Google’s Open Images Dataset V4](https://towardsdatascience.com/faster-r-cnn-object-detection-implemented-by-keras-for-custom-data-from-googles-open-images-125f62b9141a)  
