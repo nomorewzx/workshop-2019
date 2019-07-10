@@ -55,8 +55,7 @@ def train_faster_rcnn(config: Config, train_imgs: List[ImageData], class_mapping
                     mean_overlapping_bboxes = float(sum(rpn_accuracy_rpn_monitor)) / len(rpn_accuracy_rpn_monitor)
                     rpn_accuracy_rpn_monitor = []
                     if mean_overlapping_bboxes == 0:
-                        print(
-                            'RPN is not producing bounding boxes that overlap the ground truth boxes. Check RPN settings or keep training.')
+                        print('RPN is not producing bounding boxes that overlap the ground truth boxes. Check RPN settings or keep training.')
 
                 # Generate X (x_img) and label Y ([y_rpn_cls, y_rpn_regr])
                 X, Y, img_data, debug_img, debug_num_pos = next(data_gen_train)
@@ -65,12 +64,11 @@ def train_faster_rcnn(config: Config, train_imgs: List[ImageData], class_mapping
                 loss_rpn = model_rpn.train_on_batch(X, Y)
 
                 # Get predicted rpn from rpn model [rpn_cls, rpn_regr]
-                P_rpn = model_rpn.predict_on_batch(X)
+                predicted_rpn = model_rpn.predict_on_batch(X)
 
                 # R: bboxes (shape=(300,4))
                 # Convert rpn layer to roi bboxes
-                R = rpn_to_roi(P_rpn[0], P_rpn[1], config, K.image_dim_ordering(), use_regr=True, overlap_thresh=0.7,
-                               max_boxes=300)
+                R = rpn_to_roi(predicted_rpn[0], predicted_rpn[1], config, use_regr=True, overlap_thresh=0.7, max_boxes=300)
 
                 # note: calc_iou converts from (x1,y1,x2,y2) to (x,y,w,h) format
                 # X2: bboxes that iou > C.classifier_min_overlap for all gt bboxes in 300 non_max_suppression bboxes

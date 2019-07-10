@@ -8,6 +8,7 @@ from keras.engine import Layer
 from keras.layers import Flatten, Dense, Input, Conv2D, MaxPooling2D, Dropout
 from keras.layers import TimeDistributed
 
+from data_models.object_detection_models import ImageData
 from object_detection.ground_truth_anchor_generator import get_new_img_size
 from object_detection.iou_calculator import iou
 
@@ -346,14 +347,14 @@ def apply_regr(x, y, w, h, tx, ty, tw, th):
         return x, y, w, h
 
 
-def calc_iou(R, img_data, C, class_mapping):
+def calc_iou(R, img_data: ImageData, C, class_mapping):
     """Converts from (x1,y1,x2,y2) to (x,y,w,h) format
 
     Args:
         R: bboxes, probs
     """
-    bboxes = img_data['bboxes']
-    (width, height) = (img_data['width'], img_data['height'])
+    bboxes = img_data.bboxes
+    (width, height) = (img_data.img_width, img_data.img_height)
     # get image dimensions for resizing
     (resized_width, resized_height) = get_new_img_size(width, height, C.im_size)
 
@@ -362,10 +363,10 @@ def calc_iou(R, img_data, C, class_mapping):
     for bbox_num, bbox in enumerate(bboxes):
         # get the GT box coordinates, and resize to account for image resizing
         # gta[bbox_num, 0] = (40 * (600 / 800)) / 16 = int(round(1.875)) = 2 (x in feature map)
-        gta[bbox_num, 0] = int(round(bbox['x1'] * (resized_width / float(width)) / C.rpn_stride))
-        gta[bbox_num, 1] = int(round(bbox['x2'] * (resized_width / float(width)) / C.rpn_stride))
-        gta[bbox_num, 2] = int(round(bbox['y1'] * (resized_height / float(height)) / C.rpn_stride))
-        gta[bbox_num, 3] = int(round(bbox['y2'] * (resized_height / float(height)) / C.rpn_stride))
+        gta[bbox_num, 0] = int(round(bbox.x1 * (resized_width / float(width)) / C.rpn_stride))
+        gta[bbox_num, 1] = int(round(bbox.x2 * (resized_width / float(width)) / C.rpn_stride))
+        gta[bbox_num, 2] = int(round(bbox.y1 * (resized_height / float(height)) / C.rpn_stride))
+        gta[bbox_num, 3] = int(round(bbox.y2 * (resized_height / float(height)) / C.rpn_stride))
 
     x_roi = []
     y_class_num = []
@@ -404,7 +405,7 @@ def calc_iou(R, img_data, C, class_mapping):
                 # hard negative example
                 cls_name = 'bg'
             elif C.classifier_max_overlap <= best_iou:
-                cls_name = bboxes[best_bbox]['class']
+                cls_name = bboxes[best_bbox].class_name
                 cxg = (gta[best_bbox, 0] + gta[best_bbox, 1]) / 2.0
                 cyg = (gta[best_bbox, 2] + gta[best_bbox, 3]) / 2.0
 
@@ -449,7 +450,7 @@ def calc_iou(R, img_data, C, class_mapping):
     return np.expand_dims(X, axis=0), np.expand_dims(Y1, axis=0), np.expand_dims(Y2, axis=0), IoUs
 
 
-def rpn_to_roi(rpn_layer, regr_layer, C, dim_ordering, use_regr=True, max_boxes=300, overlap_thresh=0.9):
+def rpn_to_roi(rpn_layer, regr_layer, C, use_regr=True, max_boxes=300, overlap_thresh=0.9):
     """Convert rpn layer to roi bboxes
 
     Args: (num_anchors = 9)
@@ -466,7 +467,7 @@ def rpn_to_roi(rpn_layer, regr_layer, C, dim_ordering, use_regr=True, max_boxes=
 
     Returns:
         result: boxes from non-max-suppression (shape=(300, 4))
-            boxes: coordinates for bboxes (on the feature map)
+        boxes: coordinates for bboxes (on the feature map)
     """
     regr_layer = regr_layer / C.std_scaling
 
