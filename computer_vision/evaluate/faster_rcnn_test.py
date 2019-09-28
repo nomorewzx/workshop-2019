@@ -10,6 +10,8 @@ import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.patches import Rectangle
+
+from object_detection.faster_rcnn.neural_network_components import rpn_to_roi
 from object_detection.ground_truth_anchor_generator import get_new_img_size
 
 
@@ -42,9 +44,8 @@ class FasterRcnnEvaluationTest(unittest.TestCase):
         axes: Axes = plt.axes()
         axes.imshow(test_img)
 
-        positive_prediction = np.where(rpn_classes > 0.99)
-        print(positive_prediction[-1])
-        print(len(positive_prediction[0]))
+        positive_prediction = np.where(rpn_classes > 0.7)
+
         for i in range(len(positive_prediction[0])):
             img_idx = positive_prediction[0][i]
             row_idx = positive_prediction[1][i]
@@ -111,6 +112,54 @@ class FasterRcnnEvaluationTest(unittest.TestCase):
 
         fig.add_axes(axes)
         plt.show()
+
+    def test_apply_rpn_to_roi_and_nms_layer(self):
+        config = Config()
+        config.model_path = os.path.join(settings.MODEL_WEIGHTS_DIR, 'faster_rcnn', 'model_frcnn_vgg.hdf5')
+
+        img_file_path = os.path.join(settings.PROJECT_BASE_DIR, 'object_detection', 'resources', 'c6dad5afbd0ff7a1.jpg')
+
+        to_predict_img = cv2.imread(img_file_path)
+
+        height, width = to_predict_img.shape[:2]
+
+        resized_width, resized_height = get_new_img_size(width=width, height=height)
+
+        test_img = cv2.resize(to_predict_img, (resized_width, resized_height))
+        test_img = cv2.cvtColor(test_img, cv2.COLOR_BGR2RGB)
+
+        fig: Figure = plt.figure()
+        axes: Axes = plt.axes()
+        axes.imshow(test_img)
+
+        predicted_rpn = evaluate_faster_rcnn(config=config, img=test_img)
+        # [(classification_output), (regression_output)]
+        rpn_classes = predicted_rpn[0]  # [[x,y,anchor_idx],[],[]]
+        rpn_regression = predicted_rpn[1]
+
+        proposed_bboxes = rpn_to_roi(rpn_cls_layer=rpn_classes, regr_layer=rpn_regression, C=config)
+
+        for bbox in proposed_bboxes:
+            x1, y1, x2, y2 = bbox
+
+            x1 = x1 * config.rpn_stride
+            x2 = x2 * config.rpn_stride
+
+            y1 = y1 * config.rpn_stride
+            y2 = y2 * config.rpn_stride
+
+            bbox_rect = Rectangle((x1, y1),
+                                  width=int(x2 - x1),
+                                  height=int(y2 - y1),
+                                  linewidth=2,
+                                  edgecolor='r',
+                                  linestyle='--',
+                                  facecolor='none')
+            axes.add_patch(bbox_rect)
+
+        fig.add_axes(axes)
+        plt.show()
+
 
     def _is_bbox_in_img(self, x1, y1, x2, y2, img_width, img_height):
         if x1 < 0 or x2 > img_width or y1 < 0 or y2 > img_height:
