@@ -10,6 +10,7 @@ from settings import MATPLOTLIB_COLORS
 
 
 class ImgAugTest(unittest.TestCase):
+    @unittest.skip('display image')
     def test_img_aug(self):
         all_img_data, class_mapping = get_data('../object_detection/resources/annotation.txt', '../object_detection/resources')
 

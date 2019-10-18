@@ -8,6 +8,7 @@ import settings
 
 
 class DataLoaderTest(unittest.TestCase):
+    @unittest.skip('display image')
     def test_load_img_and_annotations(self):
         annotation_file_path = os.path.join(settings.PROJECT_BASE_DIR, 'object_detection', 'resources', 'annotation.txt')
         img_dir = os.path.join(settings.PROJECT_BASE_DIR, 'object_detection', 'resources')

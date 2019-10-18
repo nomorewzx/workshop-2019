@@ -5,6 +5,7 @@ from object_detection.img_debug_display import display_img_data
 
 
 class ImageDataTest(unittest.TestCase):
+    @unittest.skip('display image')
     def test_should_resize_image_data_bboxes(self):
         raw_bbox_1 = BBox(x1=571, y1=474, x2=667, y2=743, class_name='Person')
         raw_bbox_2 = BBox(x1=39, y1=476, x2=400, y2=578, class_name='Car')

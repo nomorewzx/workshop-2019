@@ -16,6 +16,7 @@ from object_detection.ground_truth_anchor_generator import get_new_img_size
 
 
 class FasterRcnnEvaluationTest(unittest.TestCase):
+    @unittest.skip('test model')
     def test_evaluate_rpn_of_faster_rcnn(self):
         show_all_rpn_bboxes = True
         valid_box_count = 0
@@ -113,6 +114,7 @@ class FasterRcnnEvaluationTest(unittest.TestCase):
         fig.add_axes(axes)
         plt.show()
 
+    @unittest.skip('test model')
     def test_apply_rpn_to_roi_and_nms_layer(self):
         config = Config()
         config.model_path = os.path.join(settings.MODEL_WEIGHTS_DIR, 'faster_rcnn', 'model_frcnn_vgg.hdf5')

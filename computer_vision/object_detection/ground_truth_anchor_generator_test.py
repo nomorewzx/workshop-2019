@@ -14,6 +14,7 @@ from settings import MATPLOTLIB_COLORS
 
 
 class GroundTruthRpnGeneratorTest(unittest.TestCase):
+    @unittest.skip('display image')
     def test_should_generate_rpn_ground_truth(self):
         config = Config()
         config.rpn_max_overlap = 0.5

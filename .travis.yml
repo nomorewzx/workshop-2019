@@ -1,3 +1,4 @@
 language: python
 before_install: cd computer_vision
 install: pipenv install
+script: pipenv run pytest
