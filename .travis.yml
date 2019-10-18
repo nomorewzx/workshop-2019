@@ -1,0 +1,2 @@
+language: python
+before_install: cd computer_vision
